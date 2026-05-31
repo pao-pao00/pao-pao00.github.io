@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>轻奢粉 · 作业档案库</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", Hiragino Sans GB, "Microsoft YaHei", sans-serif;
+        }
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: radial-gradient(circle at 20% 10%, #ffe6ef 0%, #fcd7e4 40%, #f7c3d6 100%);
+            cursor: grab;
+        }
+        body:active {
+            cursor: grabbing;
+        }
+        /* 全屏粒子画布 */
+        #particleCanvas {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+        /* 鼠标跟随光晕 */
+        .cursor-light {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,180,210,0.28) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 2;
+            filter: blur(10px);
+        }
+        /* 拖拽主玻璃容器 */
+        .wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: min(92%, 780px);
+            padding: 70px 50px;
+            background: rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 32px;
+            box-shadow:
+                0 10px 45px rgba(225, 130, 170, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+            z-index: 10;
+            user-select: none;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            overflow: hidden;
+        }
+        /* 容器流光扫光动画 */
+        .wrapper::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -120%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+            animation: sweep 7s infinite linear;
+        }
+        @keyframes sweep {
+            0% { left: -120%; }
+            100% { left: 120%; }
+        }
+        .wrapper:active {
+            box-shadow:
+                0 16px 60px rgba(225, 130, 170, 0.22),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+        }
+        .title-box {
+            position: relative;
+            text-align: center;
+            margin-bottom: 55px;
+        }
+        .main-title {
+            font-size: 38px;
+            letter-spacing: 6px;
+            color: #a83f6b;
+            font-weight: 500;
+            text-shadow: 0 0 12px rgba(222, 140, 175, 0.25);
+        }
+        /* 作业卡片样式 */
+        .work-card {
+            display: block;
+            text-decoration: none;
+            padding: 22px 30px;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.24);
+            border: 1px solid rgba(255, 210, 225, 0.5);
+            border-radius: 20px;
+            color: #8c335a;
+            font-size: 21px;
+            transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .work-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255,190,220,0.2) 0, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .work-card:hover {
+            background: rgba(255, 255, 255, 0.48);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 14px 36px rgba(218, 120, 162, 0.24);
+            border-color: rgba(255, 170, 205, 0.75);
+        }
+        .work-card:hover::after {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- 粒子背景 -->
+    <canvas id="particleCanvas"></canvas>
+    <!-- 鼠标跟随柔光 -->
+    <div class="cursor-light"></div>
+    <!-- 可拖拽玻璃容器 -->
+    <div class="wrapper" id="dragBox">
+        <div class="title-box">
+            <!-- 这里修改了大标题 -->
+            <h1 class="main-title">✧ 我的作业合集 ✧</h1>
+        </div>
+        <a class="work-card" href=" ">作业 01 · 11.html</a >
+        <a class="work-card" href="bing.html">作业 02 · bing.html</a >
+        <a class="work-card" href="bingbing.html">作业 03 · bingbing.html</a >
+        <a class="work-card" href="index.html">作业 04 · index.html</a >
+        <a class="work-card" href="libingbing.html">作业 05 · libingbing.html</a >
+    </div>
+
+<script>
+// 1. 鼠标跟随光晕
+const light = document.querySelector(".cursor-light");
+document.addEventListener("mousemove", e => {
+    light.style.left = e.clientX + "px";
+    light.style.top = e.clientY + "px";
+});
+
+// 2. 拖拽逻辑（带回弹缓冲）
+const dragBox = document.getElementById("dragBox");
+let dragOn = false;
+let offX, offY;
+let startX, startY;
+
+dragBox.addEventListener("mousedown", e => {
+    dragOn = true;
+    startX = dragBox.offsetLeft;
+    startY = dragBox.offsetTop;
+    offX = e.clientX - dragBox.offsetLeft;
+    offY = e.clientY - dragBox.offsetTop;
+    dragBox.style.transition = "none";
+});
+document.addEventListener("mousemove", e => {
+    if (!dragOn) return;
+    dragBox.style.left = (e.clientX - offX) + "px";
+    dragBox.style.top = (e.clientY - offY) + "px";
+    dragBox.style.transform = "none";
+});
+document.addEventListener("mouseup", () => {
+    if (!dragOn) return;
+    dragOn = false;
+    dragBox.style.transition = "all 0.4s cubic-bezier(0.22, 1, 0.36, 1)";
+    // 松手回弹居中
+    dragBox.style.left = "50%";
+    dragBox.style.top = "50%";
+    dragBox.style.transform = "translate(-50%, -50%)";
+});
+
+// 3. 粉色漂浮粒子系统
+const canvas = document.getElementById("particleCanvas");
+const ctx = canvas.getContext("2d");
+let particles = [];
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
+
+class Particle {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.r = Math.random() * 4 + 1;
+        this.vx = (Math.random() - 0.5) * 0.7;
+        this.vy = (Math.random() - 0.5) * 0.7;
+        this.op = Math.random() * 0.45 + 0.08;
+    }
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+    }
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(224, 135, 178, ${this.op})`;
+        ctx.fill();
+    }
+}
+function buildParticle(count) {
+    particles = [];
+    for(let i=0; i<count; i++) particles.push(new Particle());
+}
+buildParticle(80);
+
+function renderLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p=>{p.update();p.draw();});
+    requestAnimationFrame(renderLoop);
+}
+renderLoop();
+</script>
+</body>
+</html>
