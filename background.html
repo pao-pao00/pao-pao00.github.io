@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作业汇总主页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+            cursor: url('https://i.imgur.com/Y4sXqXf.png'), auto;
+        }
+        body {
+            background: linear-gradient(135deg, #FFD6E0, #FFC8DD, #FFB3C6);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        /*左上角学号*/
+        .sid{
+            position: fixed;
+            top:20px;
+            left:20px;
+            background:rgba(255,255,255,0.38);
+            padding:7px 18px;
+            border-radius:30px;
+            font-size:19px;
+            color:#882b52;
+            font-weight:bold;
+            backdrop-filter: blur(5px);
+            z-index:99;
+        }
+        /*按钮居中容器*/
+        .box{
+            position:absolute;
+            top:50%;
+            left:50%;
+            transform:translate(-50%,-50%);
+            display:flex;
+            flex-direction:column;
+            gap:22px;
+            width:480px;
+            z-index:99;
+        }
+        /*可点击按钮样式，肉眼明显是按钮*/
+        .box a{
+            display:block;
+            text-align:center;
+            padding:22px 0;
+            text-decoration:none;
+            font-size:22px;
+            color:#69203e;
+            background:rgba(255,255,255,0.45);
+            border-radius:18px;
+            border:1px solid rgba(255,255,255,0.7);
+            transition:0.25s;
+        }
+        .box a:hover{
+            background:rgba(255,255,255,0.75);
+            transform:translateY(-4px);
+            box-shadow:0 7px 20px rgba(219,122,158,0.32);
+        }
+        /*星星画布底层*/
+        #star{
+            position:fixed;
+            width:100%;
+            height:100%;
+            top:0;left:0;
+            pointer-events:none;
+            z-index:1;
+        }
+        /*水波纹顶层*/
+        #wave{
+            position:fixed;
+            width:100%;
+            height:100%;
+            top:0;left:0;
+            pointer-events:none;
+            z-index:9999;
+        }
+    </style>
+</head>
+<body>
+    <div class="sid">学号：25101020161</div>
+
+    <!-- 跳转地址和仓库文件名一一对应，仓库全都存在，在线必能点开 -->
+    <div class="box">
+        <a href="11.html">作业一</a>
+        <a href="bingbing.html">作业二</a>
+        <a href="libingbing.html">作业三</a>
+    </div>
+
+    <canvas id="star"></canvas>
+    <canvas id="wave"></canvas>
+
+<script>
+//黄色闪烁星星
+const st = document.getElementById('star');
+const stc = st.getContext('2d');
+st.width = innerWidth; st.height = innerHeight;
+let stars = [];
+class Star{
+    constructor(){
+        this.x = Math.random()*st.width;
+        this.y = Math.random()*st.height;
+        this.r = Math.random()*2+0.4;
+        this.op = Math.random();
+        this.sp = (Math.random()*0.007)+0.002;
+    }
+    draw(){
+        stc.beginPath();
+        stc.arc(this.x,this.y,this.r,0,Math.PI*2);
+        stc.fillStyle=`rgba(255,230,75,${this.op})`;
+        stc.fill();
+    }
+    blink(){
+        this.op += this.sp;
+        if(this.op>1 || this.op<0.1) this.sp = -this.sp;
+    }
+}
+for(let i=0;i<130;i++) stars.push(new Star());
+function starRun(){
+    stc.clearRect(0,0,st.width,st.height);
+    stars.forEach(s=>{s.draw();s.blink()})
+    requestAnimationFrame(starRun);
+}
+starRun();
+window.onresize=()=>{st.width=innerWidth;st.height=innerHeight;}
+
+//鼠标水波纹
+const wa = document.getElementById('wave');
+const wac = wa.getContext('2d');
+wa.width = innerWidth; wa.height = innerHeight;
+let rippleList = [];
+class Ripple{
+    constructor(x,y){
+        this.x=x;this.y=y;
+        this.r=0; this.maxR=110; this.opa=0.55; this.s=2.1;
+    }
+    update(){
+        this.r += this.s;
+        this.opa -= 0.011;
+    }
+    draw(){
+        wac.beginPath();
+        wac.arc(this.x,this.y,this.r,0,Math.PI*2);
+        wac.strokeStyle=`rgba(238,110,152,${this.opa})`;
+        wac.lineWidth=2;
+        wac.stroke();
+    }
+}
+window.onmousemove=e=>{
+    rippleList.push(new Ripple(e.clientX,e.clientY));
+    if(rippleList.length>85) rippleList.shift();
+}
+function waveRun(){
+    wac.clearRect(0,0,wa.width,wa.height);
+    for(let i=rippleList.length-1;i>=0;i--){
+        rippleList[i].update();
+        rippleList[i].draw();
+        if(rippleList[i].opa<=0) rippleList.splice(i,1);
+    }
+    requestAnimationFrame(waveRun);
+}
+waveRun();
+</script>
+</body>
+</html>
