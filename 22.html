@@ -3,69 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>焦点轮播</title>
+    <title>Flex实现焦点图Banner</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        
         .banner-wrap {
-            width: 90%;
+            width: 95%;
             max-width: 1200px;
-            margin: 50px auto;
+            margin: 30px auto;
             position: relative;
-            overflow: hidden;
-            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .banner-img img {
+        
+        .banner-img {
             width: 100%;
             display: block;
         }
+       
         .arrow {
-            width: 50px;
-            height: 50px;
-            background: rgba(180,230,255,0.6);
-            border:2px solid #f44336;
-            border-radius:6px;
-            display:flex;align-items:center;justify-content:center;
-            font-size:24px;color:#fff;cursor:pointer;position:absolute;top:50%;transform:translateY(-50%);z-index:9
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
         }
-        .arrow-left{left:15px;}
-        .arrow-right{right:15px;}
-        .dot-box{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:12px;}
-        .dot{width:20px;height:20px;border:2px solid red;border-radius:50%;background:#b8e8f9;cursor:pointer;}
-        .dot.active{background:#22aadd;}
+        
+        .arrow-left {
+            left: 20px;
+        }
+        
+        .arrow-right {
+            right: 20px;
+        }
+        .arrow img {
+            width: 100%;
+            height: 100%;
+        }
+       
+        .point-box {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px; /* flex子元素间距 */
+        }
+       
+        .point {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #b3e6f9;
+            cursor: pointer;
+        }
+       
+        .point.active {
+            background: #00b4e6;
+        }
     </style>
 </head>
 <body>
-<div class="banner-wrap">
-    <div class="arrow arrow-left">&lt;</div>
-    <div class="banner-img">
-        <!-- 稳定测试图地址，1、2、3三张轮播图 -->
-        <img src="c:\Users\14893\OneDrive\Desktop\作业\banner1.jpg" alt="轮播图">
+    <div class="banner-wrap">
+        <!-- 左箭头 -->
+        <div class="arrow arrow-left">
+            < img src="arrow1.png" alt="左箭头">
+        </div>
+        <!-- Banner主图 -->
+        < img class="banner-img" src="banner1.jpg" alt="世界地球日">
+        <!-- 右箭头 -->
+        <div class="arrow arrow-right">
+            < img src="arrow2.png" alt="右箭头">
+        </div>
+        <!-- 底部指示器圆点 flex布局 -->
+        <div class="point-box">
+            <div class="point"></div>
+            <div class="point active"></div>
+            <div class="point"></div>
+            <div class="point"></div>
+        </div>
     </div>
-    <div class="arrow arrow-right">&gt;</div>
-    <div class="dot-box">
-        <div class="dot"></div>
-        <div class="dot active"></div>
-        <div class="dot"></div>
-    </div>
-</div>
-<script>
-const dots = document.querySelectorAll('.dot');
-let idx=1;
-dots.forEach((d,i)=>d.onclick=()=>{
-    dots.forEach(x=>x.classList.remove('active'));d.classList.add('active');idx=i;
-})
-document.querySelector('.arrow-right').onclick=()=>{
-    idx=(idx+1)%dots.length;
-    dots.forEach(x=>x.classList.remove('active'));dots[idx].classList.add('active');
-}
-document.querySelector('.arrow-left').onclick=()=>{
-    idx=(idx-1+dots.length)%dots.length;
-    dots.forEach(x=>x.classList.remove('active'));dots[idx].classList.add('active');
-}
-</script>
 </body>
 </html>
