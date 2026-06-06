@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人作业主页</title>
+    <title>作业汇总主页</title>
     <style>
         * {
             margin: 0;
@@ -15,173 +15,155 @@
         body {
             background: linear-gradient(135deg, #FFD6E0, #FFC8DD, #FFB3C6);
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
         }
-        /* 左上角学号 */
-        .stu-id {
+        /*左上角学号*/
+        .sid{
             position: fixed;
-            top: 22px;
-            left: 28px;
-            font-size: 20px;
-            color: #992E5B;
-            font-weight: 600;
-            letter-spacing: 1px;
-            background: rgba(255,255,255,0.35);
-            padding: 8px 16px;
-            border-radius: 30px;
-            backdrop-filter: blur(6px);
-            z-index:10;
+            top:20px;
+            left:20px;
+            background:rgba(255,255,255,0.38);
+            padding:7px 18px;
+            border-radius:30px;
+            font-size:19px;
+            color:#882b52;
+            font-weight:bold;
+            backdrop-filter: blur(5px);
+            z-index:99;
         }
-        /* 按钮容器居中 */
-        .work-box {
-            width: 520px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            z-index:10;
+        /*按钮居中容器*/
+        .box{
+            position:absolute;
+            top:50%;
+            left:50%;
+            transform:translate(-50%,-50%);
+            display:flex;
+            flex-direction:column;
+            gap:22px;
+            width:480px;
+            z-index:99;
         }
-        /* 可点击按钮样式 */
-        .work-item a {
-            display: block;
-            text-decoration: none;
-            text-align: center;
-            padding: 20px;
-            font-size: 22px;
-            color: #721F42;
-            background: rgba(255,255,255,0.42);
-            border-radius: 16px;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.6);
-            transition: all 0.3s ease;
+        /*可点击按钮样式，肉眼明显是按钮*/
+        .box a{
+            display:block;
+            text-align:center;
+            padding:22px 0;
+            text-decoration:none;
+            font-size:22px;
+            color:#69203e;
+            background:rgba(255,255,255,0.45);
+            border-radius:18px;
+            border:1px solid rgba(255,255,255,0.7);
+            transition:0.25s;
         }
-        .work-item a:hover {
-            background: rgba(255,255,255,0.7);
-            transform: translateY(-5px);
-            box-shadow: 0 8px 22px rgba(224, 130, 166, 0.35);
+        .box a:hover{
+            background:rgba(255,255,255,0.75);
+            transform:translateY(-4px);
+            box-shadow:0 7px 20px rgba(219,122,158,0.32);
         }
-        #ripple-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9999;
-        }
-        #starCanvas{
+        /*星星画布底层*/
+        #star{
             position:fixed;
             width:100%;
             height:100%;
-            top:0;
-            left:0;
+            top:0;left:0;
             pointer-events:none;
             z-index:1;
+        }
+        /*水波纹顶层*/
+        #wave{
+            position:fixed;
+            width:100%;
+            height:100%;
+            top:0;left:0;
+            pointer-events:none;
+            z-index:9999;
         }
     </style>
 </head>
 <body>
-    <div class="stu-id">学号：25101020161</div>
+    <div class="sid">学号：25101020161</div>
 
-    <!-- 关键：a标签就是点击跳转，href和仓库文件名一模一样 -->
-    <div class="work-box">
-        <div class="work-item">作业一</div>
-        <div class="work-item">作业二</div>
-        <div class="work-item">作业三</div>
+    <!-- 跳转地址和仓库文件名一一对应，仓库全都存在，在线必能点开 -->
+    <div class="box">
+        作业一
+        作业二
+        作业三
     </div>
 
-    <canvas id="starCanvas"></canvas>
-    <canvas id="ripple-canvas"></canvas>
+    <canvas id="star"></canvas>
+    <canvas id="wave"></canvas>
 
-    <script>
-        //黄色闪烁星星
-        const starCvs = document.getElementById('starCanvas');
-        const sCtx = starCvs.getContext('2d');
-        starCvs.width = innerWidth;
-        starCvs.height = innerHeight;
-        let starArr = [];
-        class Star{
-            constructor(){
-                this.x = Math.random()*starCvs.width;
-                this.y = Math.random()*starCvs.height;
-                this.r = Math.random()*2+0.5;
-                this.op = Math.random();
-                this.sp = Math.random()*0.008+0.002;
-            }
-            draw(){
-                sCtx.beginPath();
-                sCtx.arc(this.x,this.y,this.r,0,Math.PI*2);
-                sCtx.fillStyle=`rgba(255,225,80,${this.op})`;
-                sCtx.fill();
-            }
-            flash(){
-                this.op += this.sp;
-                if(this.op>1||this.op<0.1) this.sp=-this.sp;
-            }
-        }
-        for(let i=0;i<120;i++) starArr.push(new Star());
-        function starLoop(){
-            sCtx.clearRect(0,0,starCvs.width,starCvs.height);
-            starArr.forEach(s=>{s.draw();s.flash()})
-            requestAnimationFrame(starLoop);
-        }
-        starLoop();
-        window.onresize=()=>{
-            starCvs.width=innerWidth;
-            starCvs.height=innerHeight;
-        }
+<script>
+//黄色闪烁星星
+const st = document.getElementById('star');
+const stc = st.getContext('2d');
+st.width = innerWidth; st.height = innerHeight;
+let stars = [];
+class Star{
+    constructor(){
+        this.x = Math.random()*st.width;
+        this.y = Math.random()*st.height;
+        this.r = Math.random()*2+0.4;
+        this.op = Math.random();
+        this.sp = (Math.random()*0.007)+0.002;
+    }
+    draw(){
+        stc.beginPath();
+        stc.arc(this.x,this.y,this.r,0,Math.PI*2);
+        stc.fillStyle=`rgba(255,230,75,${this.op})`;
+        stc.fill();
+    }
+    blink(){
+        this.op += this.sp;
+        if(this.op>1 || this.op<0.1) this.sp = -this.sp;
+    }
+}
+for(let i=0;i<130;i++) stars.push(new Star());
+function starRun(){
+    stc.clearRect(0,0,st.width,st.height);
+    stars.forEach(s=>{s.draw();s.blink()})
+    requestAnimationFrame(starRun);
+}
+starRun();
+window.onresize=()=>{st.width=innerWidth;st.height=innerHeight;}
 
-        //鼠标水波纹
-        const canvas = document.getElementById('ripple-canvas');
-        const ctx = canvas.getContext('2d');
-        let w = canvas.width = window.innerWidth;
-        let h = canvas.height = window.innerHeight;
-        let mouse = {x: null, y: null};
-        let rippleArr = [];
-        class Ripple {
-            constructor(x,y){
-                this.x = x;
-                this.y = y;
-                this.radius = 0;
-                this.maxR = 120;
-                this.alpha = 0.6;
-                this.speed = 2.2;
-            }
-            update(){
-                this.radius += this.speed;
-                this.alpha -= 0.012;
-            }
-            draw(){
-                ctx.beginPath();
-                ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);
-                ctx.strokeStyle = `rgba(236, 112, 154, ${this.alpha})`;
-                ctx.lineWidth = 2;
-                ctx.stroke();
-            }
-        }
-        window.addEventListener('mousemove',e=>{
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-            rippleArr.push(new Ripple(mouse.x,mouse.y));
-            if(rippleArr.length>80) rippleArr.shift();
-        })
-        window.addEventListener('resize',()=>{
-            w=canvas.width=innerWidth;
-            h=canvas.height=innerHeight;
-        })
-        function animate(){
-            ctx.clearRect(0,0,w,h);
-            for(let i=0;i<rippleArr.length;i++){
-                rippleArr[i].update();
-                rippleArr[i].draw();
-                if(rippleArr[i].alpha<=0) rippleArr.splice(i,1);
-            }
-            requestAnimationFrame(animate);
-        }
-        animate();
-    </script>
+//鼠标水波纹
+const wa = document.getElementById('wave');
+const wac = wa.getContext('2d');
+wa.width = innerWidth; wa.height = innerHeight;
+let rippleList = [];
+class Ripple{
+    constructor(x,y){
+        this.x=x;this.y=y;
+        this.r=0; this.maxR=110; this.opa=0.55; this.s=2.1;
+    }
+    update(){
+        this.r += this.s;
+        this.opa -= 0.011;
+    }
+    draw(){
+        wac.beginPath();
+        wac.arc(this.x,this.y,this.r,0,Math.PI*2);
+        wac.strokeStyle=`rgba(238,110,152,${this.opa})`;
+        wac.lineWidth=2;
+        wac.stroke();
+    }
+}
+window.onmousemove=e=>{
+    rippleList.push(new Ripple(e.clientX,e.clientY));
+    if(rippleList.length>85) rippleList.shift();
+}
+function waveRun(){
+    wac.clearRect(0,0,wa.width,wa.height);
+    for(let i=rippleList.length-1;i>=0;i--){
+        rippleList[i].update();
+        rippleList[i].draw();
+        if(rippleList[i].opa<=0) rippleList.splice(i,1);
+    }
+    requestAnimationFrame(waveRun);
+}
+waveRun();
+</script>
 </body>
 </html>
