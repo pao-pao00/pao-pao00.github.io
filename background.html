@@ -17,6 +17,7 @@
             min-height: 100vh;
             overflow-x: hidden;
         }
+        /* 左上角学号 */
         .stu-id {
             position: fixed;
             top: 22px;
@@ -31,6 +32,7 @@
             backdrop-filter: blur(6px);
             z-index:10;
         }
+        /* 按钮容器居中 */
         .work-box {
             width: 520px;
             position: absolute;
@@ -42,7 +44,7 @@
             gap: 24px;
             z-index:10;
         }
-        /* 按钮样式+可点击 */
+        /* 可点击按钮样式 */
         .work-item a {
             display: block;
             text-decoration: none;
@@ -84,7 +86,7 @@
 <body>
     <div class="stu-id">学号：25101020161</div>
 
-    <!-- 正确超链接配置：点击跳转对应文件 -->
+    <!-- 关键：a标签就是点击跳转，href和仓库文件名一模一样 -->
     <div class="work-box">
         <div class="work-item">作业一</div>
         <div class="work-item">作业二</div>
@@ -95,6 +97,7 @@
     <canvas id="ripple-canvas"></canvas>
 
     <script>
+        //黄色闪烁星星
         const starCvs = document.getElementById('starCanvas');
         const sCtx = starCvs.getContext('2d');
         starCvs.width = innerWidth;
@@ -131,6 +134,7 @@
             starCvs.height=innerHeight;
         }
 
+        //鼠标水波纹
         const canvas = document.getElementById('ripple-canvas');
         const ctx = canvas.getContext('2d');
         let w = canvas.width = window.innerWidth;
